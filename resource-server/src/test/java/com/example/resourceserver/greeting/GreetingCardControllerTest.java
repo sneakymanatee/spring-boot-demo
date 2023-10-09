@@ -5,12 +5,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -101,4 +101,21 @@ class GreetingCardControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrlPattern("**/login"));
     }
+
+    @Test
+    @DisplayName("postPurchase when user isAbleToPurchase is false should return 403")
+    void postPurchase_when_user_isAbleToPurchase_is_false_should_return_403() throws Exception {
+        var user = new GreetingCardUser();
+        user.setUsername("User1");
+        user.setAbleToPurchase(false);
+
+        this.mockMvc.perform(post("/purchase")
+                        .content("This is a card")
+                        .with(user(new GreetingCardUserService.GreetingCardUserDetails(user)))
+                        .with(csrf())   // Add CSRF token
+                )
+                .andExpect(status().isForbidden());
+    }
+
+
 }

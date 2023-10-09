@@ -19,8 +19,8 @@ public class GreetingCardUserService {
         @Override
         public Collection<? extends GrantedAuthority> getAuthorities() {
             List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList("USER");
-            if (this.isAdmin()) {
-                authorities.add(new SimpleGrantedAuthority("ADMIN"));
+            if (this.isAbleToPurchase()) {
+                authorities.add(new SimpleGrantedAuthority("PURCHASE_ALLOWED"));
             }
             return authorities;
         }
